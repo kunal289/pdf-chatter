@@ -4,21 +4,21 @@
   --font-display: "Newsreader", Georgia, "Times New Roman", serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --bg: #f5f4f0;
+  --bg: #eef1fb;
   --surface: #ffffff;
-  --surface-2: #faf9f6;
-  --sidebar: #fbfaf7;
-  --border: #e6e3dc;
-  --border-strong: #d6d2c8;
-  --text: #1b1a17;
-  --text-2: #55524a;
-  --muted: #8a867b;
-  --accent: #0f766e;
-  --accent-hover: #0b5f58;
-  --accent-soft: #e2f1ee;
-  --accent-ink: #0a5a53;
-  --user-bubble: #1b1a17;
-  --user-text: #fbfaf7;
+  --surface-2: #f6f7fd;
+  --sidebar: #e6eafa;
+  --border: #dbe0f3;
+  --border-strong: #c3cbe8;
+  --text: #151a33;
+  --text-2: #4a5170;
+  --muted: #7b82a3;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-soft: #e4e6fd;
+  --accent-ink: #3730a3;
+  --user-bubble: #312e81;
+  --user-text: #f5f6ff;
   --danger: #b4281f;
   --danger-soft: #fbeceb;
   --warn-soft: #fdf3dc;
@@ -27,30 +27,36 @@
   --shadow-sm: 0 1px 2px rgba(27, 26, 23, 0.06);
   --shadow-md: 0 6px 24px -8px rgba(27, 26, 23, 0.18);
   --radius: 12px;
+  --glow-1: rgba(99, 102, 241, 0.20);
+  --glow-2: rgba(14, 165, 233, 0.16);
+  --glow-3: rgba(168, 85, 247, 0.12);
   color-scheme: light;
 }
 
 :root[data-theme="dark"] {
-  --bg: #0f1110;
-  --surface: #171a18;
-  --surface-2: #1c201d;
-  --sidebar: #131614;
-  --border: #272c29;
-  --border-strong: #353b37;
-  --text: #ecebe5;
-  --text-2: #b6b4aa;
-  --muted: #858378;
-  --accent: #3fbfab;
-  --accent-hover: #5fd0be;
-  --accent-soft: #14322d;
-  --accent-ink: #7fe0cf;
-  --user-bubble: #243b36;
-  --user-text: #ecf6f3;
+  --bg: #0a0e1f;
+  --surface: #121832;
+  --surface-2: #171e3d;
+  --sidebar: #0d1228;
+  --border: #232b50;
+  --border-strong: #323c68;
+  --text: #e9ecfb;
+  --text-2: #b0b7d8;
+  --muted: #7f87ad;
+  --accent: #8b93ff;
+  --accent-hover: #a5abff;
+  --accent-soft: #1d2350;
+  --accent-ink: #b9bfff;
+  --user-bubble: #2c2f7a;
+  --user-text: #eef0ff;
   --danger: #ff8077;
   --danger-soft: #34191a;
   --warn-soft: #33290f;
   --warn: #f1c35b;
   --ok: #4cd07f;
+  --glow-1: rgba(99, 102, 241, 0.28);
+  --glow-2: rgba(14, 165, 233, 0.16);
+  --glow-3: rgba(168, 85, 247, 0.16);
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 28px -8px rgba(0, 0, 0, 0.6);
   color-scheme: dark;
@@ -95,12 +101,19 @@ code, kbd { font-family: var(--font-mono); }
 
 /* ============ Layout ============ */
 .app { display: grid; grid-template-columns: 330px minmax(0, 1fr); height: 100%; }
-.main { position: relative; display: flex; flex-direction: column; min-width: 0; height: 100%; background: var(--bg); }
+.main {
+  position: relative; display: flex; flex-direction: column; min-width: 0; height: 100%;
+  background:
+    radial-gradient(900px 520px at 85% -8%, var(--glow-1), transparent 62%),
+    radial-gradient(760px 460px at 8% 105%, var(--glow-2), transparent 60%),
+    radial-gradient(600px 400px at 100% 100%, var(--glow-3), transparent 65%),
+    var(--bg);
+}
 
 /* ============ Sidebar ============ */
 .sidebar {
   display: flex; flex-direction: column; gap: 18px; padding: 18px 16px 12px;
-  background: var(--sidebar); border-right: 1px solid var(--border); overflow-y: auto; min-height: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 7%, var(--sidebar)) 0%, var(--sidebar) 55%); border-right: 1px solid var(--border); overflow-y: auto; min-height: 0;
 }
 .brand { display: flex; align-items: center; gap: 12px; padding: 2px 4px 4px; }
 .brand-name { font-weight: 700; font-size: 16px; letter-spacing: -0.01em; }
