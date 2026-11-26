@@ -1,4 +1,5 @@
 """Thin wrapper around the Google Gemini API (google-genai SDK)."""
+import asyncio
 import time
 from typing import AsyncIterator
 
@@ -62,15 +63,43 @@ class GeminiClient:
         return _normalize(np.asarray(out, dtype=np.float32))
 
     async def stream(self, system: str, turns: list[tuple[str, str]]) -> AsyncIterator[str]:
-        """turns: [(role, text)] with role in {'user','model'}."""
+        """turns: [(role, text)] with role in {'user','model'}.
+
+        Gemini sometimes answers 429/500/503 ("high demand"). Before the first token has been
+        sent we retry with backoff, then fall back to a lighter model, so a busy moment does not
+        surface as an error to the user.
+        """
         contents = [types.Content(role=r, parts=[types.Part(text=t)]) for r, t in turns]
-        stream = await self.client.aio.models.generate_content_stream(
-            model=self.s.gemini_model,
-            contents=contents,
-            config=types.GenerateContentConfig(
-                system_instruction=system, temperature=0.3, top_p=0.85, top_k=40
-            ),
+        config = types.GenerateContentConfig(
+            system_instruction=system, temperature=0.3, top_p=0.85, top_k=40
         )
-        async for chunk in stream:
-            if chunk.text:
-                yield chunk.text
+        models = [self.s.gemini_model]
+        if self.s.fallback_model and self.s.fallback_model != self.s.gemini_model:
+            models.append(self.s.fallback_model)
+
+        last_err: Exception | None = None
+        for model in models:
+            for attempt in range(3):
+                started = False
+                try:
+                    stream = await self.client.aio.models.generate_content_stream(
+                        model=model, contents=contents, config=config
+                    )
+                    async for chunk in stream:
+                        if chunk.text:
+                            started = True
+                            yield chunk.text
+                    return
+                except LLMNotConfigured:
+                    raise
+                except Exception as e:
+                    if started:  # already streaming to the user; do not repeat text
+                        raise
+                    last_err = e
+                    code = getattr(e, "code", None)
+                    if code == 404:  # model name not available: go straight to the fallback model
+                        break
+                    if code not in (429, 500, 502, 503, 504):
+                        raise
+                    await asyncio.sleep(1.5 * (attempt + 1))
+        raise last_err  # type: ignore[misc]

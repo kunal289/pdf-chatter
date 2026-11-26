@@ -10,7 +10,8 @@ load_dotenv()
 @dataclass(frozen=True)
 class Settings:
     google_api_key: str = os.getenv("GOOGLE_API_KEY", "")
-    gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+    gemini_model: str = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+    fallback_model: str = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.5-flash-lite")
     embedding_model: str = os.getenv("EMBEDDING_MODEL", "gemini-embedding-001")
     embedding_dim: int = 768
 
